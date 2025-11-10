@@ -363,7 +363,7 @@ function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
 function getSpellCount(creatureIndex=0,questLevel=0, isHall=0){
 	var spellCount=Math.round(Math.random()* creatureList[creatureIndex][3]);//Random based on the max spells for the creature. 
 		
-	//alert(Math.random()* creatureList[creatureIndex][3] + "  " + questLevel);
+	
 	if(questLevel<12){
 		if(spellCount>1){
 			spellCount=1;
@@ -531,8 +531,7 @@ function setCreatureOdds(questLevel=0){
 				//This would be a Beast in the original set. 
 				if(largeCreatureLowerBounds<=9){
 					if(largeCreatureLowerBounds2<=9){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
-						alert("9");
+						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);						
 					}else{
 						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
 					}				
@@ -620,8 +619,7 @@ function setCreatureOdds(questLevel=0){
 function backupTable(MU="M"){
 	//MU is for move or undo.
 	//This makes a copy of the table before a move(if M) or recopies old copy into active table (U)
-	//alert("backupTable");
-	//alert(MU);
+
 	if(MU=="M"){
 		for(a=0;a<extRows;a++){
 			for(b=0;b<extCols;b++){
@@ -634,7 +632,6 @@ function backupTable(MU="M"){
 		noteBackup=document.getElementById("results").value;
 	
 	}else{
-	//	alert("Undo");
 		for(a=0;a<extRows;a++){
 			for(b=0;b<extCols;b++){
 				for(c=0;c<8;c++){
@@ -644,7 +641,7 @@ function backupTable(MU="M"){
 		}
 		document.getElementById("results").value=noteBackup;
 	}
-	//alert("backupTable Completed");
+
 }
 
 
@@ -794,7 +791,6 @@ function addFurniture(roomNum=0, isLastRoom=0){
 
 		//Now for each numItems try to get a furniture item from getFurniture and then try to place it in the room.
 		for(i=0;i<numItems;i++){
-			//alert(numItems);
 			tempFurn=getFurniture();
 			tempDesc=furnitureList[tempFurn][4]+" "+furnitureList[tempFurn][5];
 
@@ -875,7 +871,7 @@ function addFurniture(roomNum=0, isLastRoom=0){
 					}else{												
 						gameBoard[placeRow][placeCol][1]=tempDesc + " (small furniture)";
 					}
-					//alert("Would place " + tempDesc +" at location "+placeRow + ","+placeCol);
+				
 					//numItems-=1;
 					break outerLoop;
 				}
@@ -966,9 +962,8 @@ function openSearch(isHall=false){
 		//Added this 7-25-22 to give a higher change of secret door if a hallway.
 		//Added this 8-1-22 to give an even higher chance of secret door if a hallway.
 		randomTotal=Math.floor(Math.random() *100)+1;
-		//alert("Got to here!");
+	
 		if (randomTotal<60){
-			//alert("Got to here too!");
 			itemType=80;
 		}
 	}
@@ -1117,7 +1112,6 @@ function generateBlankBoard(){
 		var roomRows=0;
 		var roomCols=0;
 		var notInRoom=" ";
-		//alert(gameBoard);
 
 	
 		for(curRoom=0; curRoom<extRoomSet.length; curRoom+=1){ 
@@ -1236,7 +1230,6 @@ function generateBlankBoard(){
 				}
 			}
 		}
-		//alert(gameBoard);
 
 	//Finish up the rest
 	
@@ -1311,21 +1304,17 @@ function createStartRoom(){
 	//gameBoard[startRow][startCol][7]=1;
 	extRoomSet[startRoom][9]=1;
 	
-	
-	//alert("createStartRoom - Room: " + startRoom);
+
 
 	try{	
 		addDoors(startRoom,0,true);
 	}catch{
-		//alert("error when adding doors");
 	}
 
-	//alert("Got through that, so it should go ahead and add stairs");
 	
 	try{
 		placeStairs(startRoom);
 	}catch{
-		//Do nothing, I guess.
 	}
 
 
@@ -1333,7 +1322,6 @@ function createStartRoom(){
 	try{
 		addCreatures(startRoom,false);
 	}catch{
-		//alert("Error when placing creatures");
 	}
 }
 
@@ -1392,7 +1380,6 @@ function placeStairs(roomNum){
 		gameBoard[x+1][y][1]="@Stairs(furniture)";
 		gameBoard[x+1][y+1][1]="@Stairs(furniture)";
 	}catch{
-		//alert("Error when placing stairs");
 	}
 
 
@@ -1426,7 +1413,6 @@ function placeStairs(roomNum){
 				break;
 		}
 	}catch{
-		//alert("Error when placing direction arrow");
 	}
 }
 
@@ -1499,7 +1485,7 @@ function showBoard(expandRoom=0){
 	var colSpan=0;
 	var skipTD=false;
 	//Loop through existing gameBoard array and set contents of td based on that.
-	//alert("showBoard");
+
 
 
 	colorBoard();
@@ -1637,7 +1623,7 @@ function showBoard(expandRoom=0){
 		newGameBoard+="</tr>";
 	}
 	newGameBoard+="</table>";
-	//alert("showBoard Complete");
+
 
 	
 
@@ -1645,7 +1631,6 @@ function showBoard(expandRoom=0){
 	
 	document.getElementById("gameBoard").innerHTML=newGameBoard;
 
-	//alert("I need to find a way to set the col width to a certain size to fit this. Or the whole gameboard element to a certain width?")
 
 	
 
@@ -1718,13 +1703,12 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	var room1StartCol=0;
 	var room1Rows=0;
 	var room1Cols=0;
+
 	
-	//alert("RoomsShareADoor");
 	
-	//if(gameBoard[checkRow][checkCol][7]!=0){
 	if(extRoomSet[room2][9]!=0){
 		//The room is open, so don't place a door. Just say there already is one.
-		//alert("No door");
+	
 		return true;
 	}
 	//Check the wall that is passed to see if any of those spaces have a door and that door shares a border with a space from room2.
@@ -1822,8 +1806,7 @@ function checkTraps(){
 	trapNum=Math.floor(Math.random()*80)+1;
 	charNum=Math.floor(Math.random()*4)+1;
 	
-	
-	//alert(trapNum + "  " + charNum);
+
 	switch(charNum){
 		case 1:
 			charNum="first";
@@ -2097,7 +2080,7 @@ function addDoors(roomNum, isLastRoom=0, isFirstRoom=false, infiniteLoopBlock=0)
 									}
 								}
 							}catch{
-								//alert("error when adding left doors");
+								
 							}
 						}else{
 							try{
@@ -2116,7 +2099,7 @@ function addDoors(roomNum, isLastRoom=0, isFirstRoom=false, infiniteLoopBlock=0)
 									}
 								}
 							}catch{
-								//alert("error within the section adding a right side door");
+							
 							}
 						}
 					}else{
@@ -2143,7 +2126,7 @@ function addDoors(roomNum, isLastRoom=0, isFirstRoom=false, infiniteLoopBlock=0)
 									}
 								}
 							}catch{
-								//alert("error when adding top doors");
+							
 							}
 						}else{
 						
@@ -2164,7 +2147,7 @@ function addDoors(roomNum, isLastRoom=0, isFirstRoom=false, infiniteLoopBlock=0)
 									}
 								}
 							}catch{
-								//alert("error when adding bottom doors");
+							
 							}
 						}
 						
@@ -2342,7 +2325,7 @@ function addCreatures(roomNum,isLastRoom){
 		if((Math.floor(Math.random()*4))==1){
 			//I in 4 chance of getting an additional creature in final room?
 			numItems=numItems+1;
-			//alert("Added one!")
+		
 		}						
 	} else if(roomNum==startRoom){
 		//This is the start room, but it is at the start. Limit creatures to two.
@@ -2589,7 +2572,6 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		//limited to just the number in a room, which is how it was working before this.
 		if((creatureList[x][1]+" ").includes("Observe Max")==true){	
 			//Don't blank this one, leave it intact.
-			//alert("Got to this part where we don't blank it.");
 		}else{
 			creatureList[x][7]=0;
 		}
@@ -2611,13 +2593,13 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			checkTraps();
 		}
 	}catch{
-		alert("Error when checking to see if room is in use already.");
+		//alert("Error when checking to see if room is in use already.");
 	}
 
 	try{	
 		backupTable("M");
 	}catch{
-		alert("Error when backing up table");
+		//alert("Error when backing up table");
 	}
 	
 
@@ -2625,7 +2607,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	try{
 		addDoors(roomNum, isLastRoom);
 	}catch{
-		alert("Error when trying toa dd doors");
+		//alert("Error when trying to add doors");
 	}
 	
 	
@@ -2633,7 +2615,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	try{
 		addFurniture(roomNum, isLastRoom);
 	}catch{
-		alert("Error when placing furniture");
+		//alert("Error when placing furniture");
 	}
 	
 	
@@ -2641,14 +2623,14 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	try{
 		addCreatures(roomNum, isLastRoom);
 	}catch{
-		alert("Error when adding creatures");
+		//alert("Error when adding creatures");
 	}
 
 	//Place items
 	try{
 		addItems(roomNum,isLastRoom);
 	}catch{
-		alert("Error when adding items");
+		//alert("Error when adding items");
 	}
 
 	

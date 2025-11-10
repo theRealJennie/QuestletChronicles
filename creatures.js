@@ -234,7 +234,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,	
 	
 	"Great White Orc", 
-	"Observe Max", /*This should limit it to a max of 1 of these per entire quest.*/
+	"Observe Max", 
 	1,
 	0,
 	"GWO",
@@ -268,4 +268,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	"(move 10 - att, def, mind, body equal to the first hero it sees. On each of its turns after that it randomly reassigns to any hero it can see.)",
 	0,
 	0
-]*/
+]
+;
+*/
+

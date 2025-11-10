@@ -8,7 +8,7 @@
 	selectionUpperRange
 	inUseCount
 */
-/*
+
 const furnitureSet=[
 
 	"Throne",
@@ -92,42 +92,6 @@ const furnitureSet=[
 	0,
 	0,
 	
-	"Small Bed",
-	3,
-	1,
-	2,
-	"Sbd",
-	"Small Bed",
-	0,
-	0,
-	
-	"Large Bed",
-	4,
-	2,
-	2,
-	"Lbd",
-	"Large Bed",
-	0,
-	0,
-	
-	"Bench",
-	4,
-	1,
-	3,
-	"Ben",
-	"Bench",
-	0,
-	0,
-	
-	"Small Table",
-	3,
-	1,
-	1,
-	"Stb",
-	"Small Table",
-	0,
-	0,
-	
 	"Bookshelf",
 	9,
 	1,
@@ -136,10 +100,10 @@ const furnitureSet=[
 	"Bookshelf.",
 	0,
 	0
-];*/
+];
 
 
-
+/*
 const furnitureSet=[
 
 	"Throne",
@@ -429,4 +393,4 @@ const furnitureSet=[
 	"Runic Calendar",
 	0,
 	0
-];
+];*/

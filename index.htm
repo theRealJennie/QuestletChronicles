@@ -198,6 +198,7 @@ var startRoom=21; //Defaults to middle
 var extRows=0; //This is the externally loaded room number of rows
 var extCols=0;
 var extRoomSet=[]; //Externall loaded roomset
+var extRoomSetBackUp=[];
 
 //gameBoard position definitions:
 //0-room number
@@ -620,26 +621,38 @@ function backupTable(MU="M"){
 	//MU is for move or undo.
 	//This makes a copy of the table before a move(if M) or recopies old copy into active table (U)
 
-	if(MU=="M"){
-		for(a=0;a<extRows;a++){
-			for(b=0;b<extCols;b++){
-				for(c=0;c<8;c++){
-					gameBoardBackup[a][b][c]=gameBoard[a][b][c];
+	try{
+		if(MU=="M"){
+			for(a=0;a<extRows;a++){
+				for(b=0;b<extCols;b++){
+					for(c=0;c<8;c++){
+						gameBoardBackup[a][b][c]=gameBoard[a][b][c];
+					}
 				}
 			}
-		}
-		//Make backup of notes (Added 1-26-25)
-		noteBackup=document.getElementById("results").value;
-	
-	}else{
-		for(a=0;a<extRows;a++){
-			for(b=0;b<extCols;b++){
-				for(c=0;c<8;c++){
-					gameBoard[a][b][c]=gameBoardBackup[a][b][c];
+			//Make backup of notes (Added 1-26-25)
+			noteBackup=document.getElementById("results").value;
+		
+			//Make backup of extRoomSet (added 11-21-25)
+			extRoomSetBackUp=structuredClone(extRoomSet);
+			//alert(extRoomSet);
+			//alert(extRoomSetBackUp);
+		
+		}else{
+			for(a=0;a<extRows;a++){
+				for(b=0;b<extCols;b++){
+					for(c=0;c<8;c++){
+						gameBoard[a][b][c]=gameBoardBackup[a][b][c];
+					}
 				}
 			}
+			document.getElementById("results").value=noteBackup;
+			
+			extRoomSet=structuredClone(extRoomSetBackUp);
+			
 		}
-		document.getElementById("results").value=noteBackup;
+	}catch{
+		//alert("Why did I get here?");
 	}
 
 }
@@ -846,7 +859,7 @@ function addFurniture(roomNum=0, isLastRoom=0){
 						continue;
 					}
 
-					//Now verify that there isn't anything already in thos locations, including a door on any of the sides.
+					//Now verify that there isn't anything already in those locations, including a door on any of the sides.
 					for(aRow=0;aRow<furnHeight;aRow+=1){
 						for(aCol=0;aCol<furnWidth;aCol+=1){							
 							if(gameBoard[placeRow+aRow][placeCol+aCol][1]!=0||gameBoard[placeRow+aRow][placeCol+aCol][2]==2||gameBoard[placeRow+aRow][placeCol+aCol][3]==2||gameBoard[placeRow+aRow][placeCol+aCol][4]==2||gameBoard[placeRow+aRow][placeCol+aCol][5]==2){
@@ -855,9 +868,21 @@ function addFurniture(roomNum=0, isLastRoom=0){
 							}
 						}
 					}
+					
+					
 
 					//Once all that is done and passed, we can now place it. (break when this happens to exit loop early)
 					if(furnWidth!=1||furnHeight!=1){	
+						
+						//Add an extra loop here that check to see if any of the spaces on each side of where It
+						//will eventually be placed is also a piece of big furniture and if so then continue outerLoop instead.
+						
+						//This will mean calling nextToMedOrLarge
+						if(nextToMedOrLarge(roomNum,placeRow,placeCol,furnWidth, furnHeight)==true){
+							//alert("It wouldn't have placed a " + tempDesc + " at " + placeRow +","+placeCol);
+							continue outerLoop;//Can't place here, it would be right next to another large item.
+						}
+						//alert(gameBoard);
 						for(furnRow=0;furnRow<furnHeight;furnRow+=1){
 							for(furnCol=0;furnCol<furnWidth;furnCol+=1){
 								
@@ -1077,7 +1102,7 @@ function generateBlankBoard(){
 	noteBackup=""; //1-27-25
 	document.getElementById("results").value="";// 1-27-25
 	
-	
+		
 	var myCounter=0;
 	while(myCounter<20){
 		itemCount[myCounter]=0;
@@ -1102,6 +1127,8 @@ function generateBlankBoard(){
 	}
 
 	gameBoardBackup=structuredClone(gameBoard);
+	extRoomSetBackUp=structuredClone(extRoomSet);
+	//alert(extRoomSetBackUp);
 
 	//Set horizontal walls for entire roomset
 		
@@ -1282,13 +1309,19 @@ function createStartRoom(){
 	
 	
 	//Randomly select starting room number.
-	startRoom=Math.floor(Math.random()*extRoomSet.length)+1;
+	startRoom=Math.floor(Math.random()*extRoomSet.length)+1; 
 
 	//I need a loop here that keeps trying to get another room until I find one that isn't a hall, as that can't be the start room.	
 	var loopCount=0;
-	while(loopCount<100 & extRoomSet[startRoom][1]>0){
-		startRoom=Math.floor(Math.random()*extRoomSet.length)+1;
-		loopCount+=1;
+	while(loopCount<100){
+		if(extRoomSet[startRoom][1]>0){
+			//This is a hall
+			startRoom=Math.floor(Math.random()*extRoomSet.length);//+1;//Why am I adding 1? I don't need to.
+			loopCount+=1;
+		}else{
+			//We found our room.
+			break;
+		}
 	}
 
 
@@ -1300,9 +1333,9 @@ function createStartRoom(){
 	numRows=getRoomRows(startRoom);
 	numCols=getRoomCols(startRoom);
 	
-	//Mark entire room as in use
+	
 	//gameBoard[startRow][startCol][7]=1;
-	extRoomSet[startRoom][9]=1;
+	
 	
 
 
@@ -1323,6 +1356,9 @@ function createStartRoom(){
 		addCreatures(startRoom,false);
 	}catch{
 	}
+	
+	//Mark entire room as in use
+	extRoomSet[startRoom][9]=1;
 }
 
 function placeStairs(roomNum){
@@ -1636,8 +1672,54 @@ function showBoard(expandRoom=0){
 
 }
 
+function nextToMedOrLarge(roomNum, startRow, startHeight, furnWidth, furnHeight){
+	//All I need to do is create a box 1 bigger in all directs based on the size of the furniture and see if any of those
+	//spaces contain the words "big furniture" and return trus if so.
+	//Make sure we don't go off the board in any direction when checking.
+	var checkRow=0;
+	var checkCol=0;
+	var checkHeight=furnHeight;
+	var checkWidth=furnWidth;
 
-function nextToMedOrLarge(checkRow,checkCol){
+	
+	if(startRow==0){
+		//Don't subtract one from row.
+		checkRow=startRow;
+		checkHeight+=1;
+	}else{
+		checkRow=startRow-1;
+		checkWidth+=2;
+	}
+	
+	if(startCol==0){
+		//Don't subtract one from col.
+		checkCol=0;
+		checkWidth+=1
+	}else{
+		checkCol=startCol-1;
+		checkWidth+=2;
+	}
+	if(startRow+furnHeight>boardRows){
+		//We can't check a row below this item as it would be off the board.
+		checkHeight-=1;
+	}
+	if(startCol+furnWidth>boardCols){
+		//We can't check a col to the right of this as it would be off the board.
+		checkWidth-=1;
+	}
+	
+	for(i=checkRow;i<checkRow+checkHeight;i+=1){
+		for(j=checkCol;j<checkCol+checkWidth;j+=1){
+			let myString=gameBoard[i][j][1]+" ";
+			if(myString.includes("big furniture")==true&&gameBoard[i][j][0]==roomNum){
+				return true;
+			}
+		}	
+	}
+		
+	return false;//default
+}
+function nextToMedOrLargeOld(checkRow,checkCol){
 	//check all around this space to make sure no large items or medium items already occupy those spaces
 	//if they do, return true;
 	//This must be checked in the check to fit phase, not the placement phase, or it'll find parts of itself
@@ -2723,5 +2805,3 @@ document.querySelector('#gameBoard')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>
-
-

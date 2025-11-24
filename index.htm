@@ -769,27 +769,33 @@ function addFurniture(roomNum=0, isLastRoom=0){
 	}else{
 
 		//Randomly decide how many items will be added in the room
-		randomChance=Math.floor(Math.random()*11);	
+		randomChance=Math.floor(Math.random()*17);	
 		switch(randomChance){
 			case 0:
 				numItems=0;
 				break;
 			case 1:
 			case 2:
+			case 11:
 				numItems=1;
 				break;
 			case 3:
 			case 4: 
 			case 5: 
+			case 12:
+			case 13:
 				numItems=2;
 				break;
 			case 6:
 			case 7: 
 			case 8: 
+			case 14:
+			case 15:
 				numItems=3;
 				break;
 			case 9:
 			case 10:
+			case 16:
 				numItems=4;
 				break;
 			default:
@@ -801,9 +807,11 @@ function addFurniture(roomNum=0, isLastRoom=0){
 		if(numRows*numCols<7&&numItems>1){
 			numItems=1;
 		}
-
+		
+		
 		//Now for each numItems try to get a furniture item from getFurniture and then try to place it in the room.
-		for(i=0;i<numItems;i++){
+		for(itemsToPlace=0;itemsToPlace<numItems;itemsToPlace++){
+		
 			tempFurn=getFurniture();
 			tempDesc=furnitureList[tempFurn][4]+" "+furnitureList[tempFurn][5];
 
@@ -839,8 +847,10 @@ function addFurniture(roomNum=0, isLastRoom=0){
 					furnHeight=switchVal;
 				}
 
+				
 				//Now I need to make about 20 attempts per piece of furniture to place it in the room, giving up when these all fail.
 				outerLoop:	for(tries=0;tries<50;tries+=1){
+					//alert("itemsToPlace=" + itemsToPlace);
 					if(numItems==0){
 						//Place no more items, just get out of this loop.
 						break;
@@ -870,19 +880,19 @@ function addFurniture(roomNum=0, isLastRoom=0){
 					}
 					
 					
-
+				
 					//Once all that is done and passed, we can now place it. (break when this happens to exit loop early)
 					if(furnWidth!=1||furnHeight!=1){	
-						
-						//Add an extra loop here that check to see if any of the spaces on each side of where It
-						//will eventually be placed is also a piece of big furniture and if so then continue outerLoop instead.
-						
+					
+						try{
 						//This will mean calling nextToMedOrLarge
-						if(nextToMedOrLarge(roomNum,placeRow,placeCol,furnWidth, furnHeight)==true){
-							//alert("It wouldn't have placed a " + tempDesc + " at " + placeRow +","+placeCol);
-							continue outerLoop;//Can't place here, it would be right next to another large item.
+						
+							if(nextToMedOrLarge(roomNum,placeRow,placeCol,furnWidth, furnHeight)==true){
+								continue outerLoop;//Can't place here, it would be right next to another large item.
+							}
+						}catch{
 						}
-						//alert(gameBoard);
+										
 						for(furnRow=0;furnRow<furnHeight;furnRow+=1){
 							for(furnCol=0;furnCol<furnWidth;furnCol+=1){
 								
@@ -893,17 +903,16 @@ function addFurniture(roomNum=0, isLastRoom=0){
 								}
 							}
 						}			
-					}else{												
+					}else{		
+					
 						gameBoard[placeRow][placeCol][1]=tempDesc + " (small furniture)";
 					}
 				
-					//numItems-=1;
 					break outerLoop;
 				}
-
+			
 			}
 		}
-
 	}
 }
 
@@ -1672,89 +1681,38 @@ function showBoard(expandRoom=0){
 
 }
 
-function nextToMedOrLarge(roomNum, startRow, startHeight, furnWidth, furnHeight){
-	//All I need to do is create a box 1 bigger in all directs based on the size of the furniture and see if any of those
-	//spaces contain the words "big furniture" and return trus if so.
-	//Make sure we don't go off the board in any direction when checking.
-	var checkRow=0;
-	var checkCol=0;
-	var checkHeight=furnHeight;
-	var checkWidth=furnWidth;
+function nextToMedOrLarge(roomNum, startRow, startCol, furWidth, furnHeight) {
+    const numRows = gameBoard.length;
+    const numCols = gameBoard[0].length;
 
-	
-	if(startRow==0){
-		//Don't subtract one from row.
-		checkRow=startRow;
-		checkHeight+=1;
-	}else{
-		checkRow=startRow-1;
-		checkWidth+=2;
-	}
-	
-	if(startCol==0){
-		//Don't subtract one from col.
-		checkCol=0;
-		checkWidth+=1
-	}else{
-		checkCol=startCol-1;
-		checkWidth+=2;
-	}
-	if(startRow+furnHeight>boardRows){
-		//We can't check a row below this item as it would be off the board.
-		checkHeight-=1;
-	}
-	if(startCol+furnWidth>boardCols){
-		//We can't check a col to the right of this as it would be off the board.
-		checkWidth-=1;
-	}
-	
-	for(i=checkRow;i<checkRow+checkHeight;i+=1){
-		for(j=checkCol;j<checkCol+checkWidth;j+=1){
-			let myString=gameBoard[i][j][1]+" ";
-			if(myString.includes("big furniture")==true&&gameBoard[i][j][0]==roomNum){
-				return true;
-			}
-		}	
-	}
-		
-	return false;//default
-}
-function nextToMedOrLargeOld(checkRow,checkCol){
-	//check all around this space to make sure no large items or medium items already occupy those spaces
-	//if they do, return true;
-	//This must be checked in the check to fit phase, not the placement phase, or it'll find parts of itself
-	var isBeside=false;
-	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow-1][checkCol][0]){
-		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
-		let myString=gameBoard[checkRow-1][checkCol][1]+" ";
-		if(myString.includes("big furniture")==true){
-			isBeside=true;
-		}
-	}
-	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow+1][checkCol][0]){
-		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
-		myString=gameBoard[checkRow+1][checkCol][1]+" ";
-		if(myString.includes("big furniture")==true){
-			isBeside=true;
-		}
-	}
-	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow][checkCol-1][0]){
-		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
-		myString=gameBoard[checkRow][checkCol-1][1]+" ";
-		if(myString.includes("big furniture")==true){
-			isBeside=true;
-		}
-	}
-	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow][checkCol+1][0]){
-		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
-		myString=gameBoard[checkRow][checkCol+1][1]+" ";
-		if(myString.includes("big furniture")==true){
-			isBeside=true;
-		}
-	}
+    // Helper to check bounds
+    function inBounds(row, col) {
+        return row >= 0 && row < numRows && col >= 0 && col < numCols;
+    }
 
-	return isBeside;
+    // Check perimeter cells around the furniture piece
+    for (let row = startRow - 1; row <= startRow + furnHeight; row++) {
+        for (let col = startCol - 1; col <= startCol + furWidth; col++) {
+            // Skip cells inside the furniture piece itself
+            if (row >= startRow && row < startRow + furnHeight && col >= startCol && col < startCol + furWidth) {
+                continue;
+            }
+            if (inBounds(row, col)) {
+                // Check if same room
+                if (gameBoard[row][col][0] === roomNum) {
+                    const cellContent = gameBoard[row][col][1];
+                    if (typeof cellContent === 'string' && cellContent.toLowerCase().includes("big furniture")) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
+
+
+
 
 function doorBlockedByFurniture(checkRow, checkCol){
 	//Essentially, you pass a space here and it checks to see if there is furniture on it. If so, can't put a door next to it.

@@ -293,7 +293,7 @@ alert("test new stff");
 
 
 
-function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
+function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0, isTrap=0){
 	var maxWandering=Math.floor(creatureList.length*.8);
 	var minWandering=Math.floor(creatureList.length*.2);
 	var creatureType=0;
@@ -322,8 +322,11 @@ function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
 	
 	
 	
-	
-	
+	//I added this part for traps 11-27-25
+	//For this we want the actual creature desciption text, not just the abbreviation.
+	if(isTrap>0){
+		
+	}
 	
 	
 	//Before we go any farther, let's check to make sure we don't have too many of this creature and retry if we do.
@@ -352,6 +355,11 @@ function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
 		retVal=retVal.replace("Dread Spells", "(" + getSpellCount(creatureType, questLevel) + " Dread Spell(s)");
 	}
 	
+	//I added this part for traps 11-27-25
+	//For this we want the actual creature desciption text, not just the abbreviation.
+	if(isTrap>0){
+		return retVal;
+	}
 	
 	if(retryCount>0){
 		return creatureType; 	//This is so the original calling function can assign description and all that. 
@@ -1065,6 +1073,7 @@ function openSearch(isHall=false){
 				}
 			}
 			break;
+			
 		case (itemType<66):
 
 			switch(Math.floor(Math.random()*7)){
@@ -1075,13 +1084,17 @@ function openSearch(isHall=false){
 					myList+=" a spear trap. Roll 1 combat die and suffer one damage if a skull is rolled.";
 					break;
 				case 3:
-					myList+=" a horde of rats. Place 3 rat tokens on spaces around hero(rats can share a space). Rats immediately attack hero with 1 attack die each. On future turns rats may move up to 6 spaces and have 1 attack die, 1 defense die, 1 body point, and 1 mind point.";
+					/*myList+=" a horde of rats. Place 3 rat tokens on spaces around hero(rats can share a space). Rats immediately attack hero with 1 attack die each. On future turns rats may move up to 6 spaces and have 1 attack die, 1 defense die, 1 body point, and 1 mind point.";*/
+					myList+=" a wondering monster! (Place randomly next to player and attack immediately) " + getMonster(1,questLevel,0,0,1);
 					break;
 				case 4:
-					myList+=" a giant spider. Place spider next to the hero. The hero immediately takes 1 damage from spider, loses their next turn, and cannot attack or defend until the conclusion of that turn. Spiders have 2 attack, 2 defend, 3 body, and 1 mind point. Any time a spider damages a hero that hero will lose their next turn and cannot attack or defend until the conclusion of that missed turn.";
+					/*myList+=" a giant spider. Place spider next to the hero. The hero immediately takes 1 damage from spider, loses their next turn, and cannot attack or defend until the conclusion of that turn. Spiders have 2 attack, 2 defend, 3 body, and 1 mind point. Any time a spider damages a hero that hero will lose their next turn and cannot attack or defend until the conclusion of that missed turn.";*/
+					//The spider is the 11th creture in that list, which is a problem. Sometimes we may not have 11 creatures in other sets, and we don't want to always get a spider. Maybe for these traps we just get a wandering monster?
+					myList+=" a wondering monster! (Place randomly next to player and attack immediately) " + getMonster(1,questLevel,0,0,1);
 					break;
 				case 5:
-					myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";
+					/*myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";*/
+					myList+=" a wondering monster! (Place randomly next to player and attack immediately) " + getMonster(1,questLevel,0,0,1);
 					break;
 				case 6:
 					myList+=" a falling skull trap. Hero rolls a combat die and suffers 1 damage if a skull is rolled. Place pile of skulls on space hero is located. When passing over this space in the future this space counts as two spaces because of how you must step over and around the skulls.";
